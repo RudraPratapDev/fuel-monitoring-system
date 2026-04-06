@@ -74,6 +74,21 @@ class ApiService {
   getReportDownloadUrl(id: string): string {
     return `${API_BASE_URL}/reports/${id}/download`;
   }
+
+  async getSettings(): Promise<any> {
+    const res = await fetch(`${API_BASE_URL}/settings`);
+    return res.json();
+  }
+
+  async updateSettings(settings: any): Promise<boolean> {
+    const res = await fetch(`${API_BASE_URL}/settings`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(settings),
+    });
+    const data = await res.json();
+    return data.success;
+  }
 }
 
 export const api = new ApiService();

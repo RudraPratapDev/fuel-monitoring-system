@@ -2,6 +2,8 @@
 
 import { SensorData, SystemStatus, ThreatAssessment, Alert } from '../types';
 import { AlertRecord } from '../models/AlertRecord';
+import { Settings } from '../models/Settings';
+import { sendTelegramAlert } from './telegram';
 import { v4Fallback } from '../utils';
 
 const TURBIDITY_THRESHOLD = 70;
@@ -141,6 +143,20 @@ async function persistAlert(assessment: ThreatAssessment, data: SensorData): Pro
       status: alert.status,
       acknowledged: false,
     });
+    
+    // Check telegram settings
+    const settings = await Settings.findOne();
+    if (settings) {
+      const { critical, warning, info } = settings.telegramAlerts;
+      if (
+        (alert.severity === 'critical' && critical) ||
+        (alert.severity === 'warning' && warning) ||
+        (alert.severity === 'info' && info)
+      ) {
+        // Fire and forget
+        sendTelegramAlert(alert.source, alert.message, alert.severity as any).catch(console.error);
+      }
+    }
   } catch (err) {
     console.error('[AlertEngine] Failed to persist alert:', err);
   }

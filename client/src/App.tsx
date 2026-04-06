@@ -9,6 +9,7 @@ import Analytics from './pages/Analytics';
 import Alerts from './pages/Alerts';
 import Security from './pages/Security';
 import Reports from './pages/Reports';
+import Settings from './pages/Settings';
 
 function App() {
   return (
@@ -22,6 +23,7 @@ function App() {
               <Route path="alerts" element={<Alerts />} />
               <Route path="security" element={<Security />} />
               <Route path="reports" element={<Reports />} />
+              <Route path="settings" element={<Settings />} />
             </Route>
           </Routes>
         </BrowserRouter>

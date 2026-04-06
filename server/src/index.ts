@@ -10,6 +10,7 @@ import mongoose from 'mongoose';
 import sensorRoutes from './routes/sensors';
 import alertRoutes from './routes/alerts';
 import reportRoutes from './routes/reports';
+import settingsRoutes from './routes/settings';
 
 import { fetchAllSensorData } from './services/blynk';
 import { insertSensorData } from './services/dataStore';
@@ -28,6 +29,7 @@ app.use(express.json());
 app.use('/api/sensors', sensorRoutes);
 app.use('/api/alerts', alertRoutes);
 app.use('/api/reports', reportRoutes);
+app.use('/api/settings', settingsRoutes);
 
 // Health check
 app.get('/api/health', (_req, res) => {
