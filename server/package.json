@@ -1,0 +1,28 @@
+{
+  "name": "fuel-sentinel-server",
+  "version": "1.0.0",
+  "description": "Fuel Sentinel Pro — IoT Dashboard Backend API",
+  "main": "dist/index.js",
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "build": "tsc",
+    "start": "node dist/index.js"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.21.0",
+    "json2csv": "^6.0.0-alpha.2",
+    "mongoose": "^8.8.0",
+    "pdfkit": "^0.15.0",
+    "ws": "^8.18.0"
+  },
+  "devDependencies": {
+    "@types/cors": "^2.8.17",
+    "@types/express": "^5.0.0",
+    "@types/pdfkit": "^0.13.5",
+    "@types/ws": "^8.5.13",
+    "tsx": "^4.19.0",
+    "typescript": "^5.6.0"
+  }
+}
