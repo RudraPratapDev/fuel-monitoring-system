@@ -10,7 +10,8 @@ import {
   Settings, 
   Sun, 
   Moon,
-  ChevronRight
+  ChevronRight,
+  MonitorPlay
 } from 'lucide-react';
 import './Layout.css';
 
@@ -24,6 +25,7 @@ export default function Layout() {
     { name: 'Alerts', path: '/alerts', icon: <Bell size={20} /> },
     { name: 'Security', path: '/security', icon: <ShieldAlert size={20} /> },
     { name: 'Reports', path: '/reports', icon: <FileText size={20} /> },
+    { name: 'Simulator', path: '/simulator', icon: <MonitorPlay size={20} /> },
   ];
 
   return (

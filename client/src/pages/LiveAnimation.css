@@ -1,0 +1,431 @@
+.animation-page {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  height: 100%;
+}
+
+.animation-header h2 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-bottom: 0.25rem;
+}
+
+.animation-header p {
+  color: var(--text-muted);
+  font-size: 0.9rem;
+}
+
+.simulation-container {
+  display: grid;
+  grid-template-columns: 300px 1fr;
+  gap: 1.5rem;
+  flex: 1;
+}
+
+.box-panel {
+  background: var(--surface-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+}
+
+.stat-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.stat-box {
+  background: var(--bg-color);
+  padding: 1rem;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  border: 1px solid var(--border-color);
+}
+
+.stat-label {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  font-weight: 600;
+  letter-spacing: 0.05em;
+}
+
+.stat-value {
+  font-size: 1.25rem;
+  font-weight: 700;
+  font-family: monospace;
+}
+
+.stat-value.danger { color: var(--danger-color); }
+.stat-value.safe { color: var(--success-color); }
+
+.canvas-area {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+  background: radial-gradient(circle at center, var(--bg-color) 0%, var(--surface-bg) 100%);
+}
+
+/* Tank System Layout */
+.tank-wrapper {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transform: scale(1.1);
+}
+
+.tank-status-indicators {
+  position: absolute;
+  top: -40px;
+  display: flex;
+  gap: 0.5rem;
+}
+
+.badge {
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.badge.danger {
+  background: rgba(239, 68, 68, 0.1);
+  color: #ef4444;
+  border: 1px solid #ef4444;
+}
+.badge.warning {
+  background: rgba(245, 158, 11, 0.1);
+  color: #f59e0b;
+  border: 1px solid #f59e0b;
+}
+
+/* Tank Design */
+.tank {
+  position: relative;
+  width: 200px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.tank-lid {
+  width: 220px;
+  height: 20px;
+  background: #334155;
+  border-radius: 4px;
+  position: relative;
+  z-index: 10;
+  transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+  transform-origin: left center;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  border: 2px solid #1e293b;
+}
+
+.lid-handle {
+  width: 40px;
+  height: 10px;
+  background: #475569;
+  border-radius: 4px 4px 0 0;
+  margin-top: -10px;
+}
+
+.reed-sensor {
+  position: absolute;
+  right: 10px;
+  top: 5px;
+  width: 20px;
+  height: 10px;
+  background: #0f172a;
+  border-radius: 2px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.sensor-light {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+}
+.sensor-light.green { background: #22c55e; box-shadow: 0 0 5px #22c55e;}
+.sensor-light.red { background: #ef4444; box-shadow: 0 0 5px #ef4444;}
+
+.tank-lid.lid-open {
+  transform: rotate(-25deg);
+}
+
+.tank-body {
+  width: 200px;
+  height: 300px;
+  background: rgba(15, 23, 42, 0.3);
+  border: 4px solid #334155;
+  border-top: none;
+  border-radius: 0 0 20px 20px;
+  position: relative;
+  overflow: hidden;
+  backdrop-filter: blur(4px);
+}
+
+/* Level Marks */
+.level-marks {
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 100%;
+  width: 10px;
+  border-right: 1px dashed rgba(255,255,255,0.2);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 10px 0;
+  z-index: 5;
+}
+
+.level-marks span {
+  font-size: 0.6rem;
+  color: var(--text-muted);
+  position: absolute;
+  left: 15px;
+  transform: translateY(-50%);
+}
+
+.level-marks span:nth-child(1) { top: 0%; }
+.level-marks span:nth-child(2) { top: 25%; }
+.level-marks span:nth-child(3) { top: 50%; }
+.level-marks span:nth-child(4) { top: 75%; }
+.level-marks span:nth-child(5) { top: 100%; transform: translateY(-100%); }
+
+/* Liquid Design */
+.liquid-container {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: flex-end;
+}
+
+.liquid {
+  width: 100%;
+  transition: height 1s ease-out, background-color 0.5s;
+  position: relative;
+  border-radius: 0 0 16px 16px;
+}
+
+.liquid-surface {
+  position: absolute;
+  top: -5px;
+  left: 0;
+  width: 100%;
+  height: 10px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 50%;
+}
+
+/* Flow & Bubble Animations */
+@keyframes floatUp {
+  0% { transform: translateY(0) scale(1); opacity: 0; }
+  20% { opacity: 0.8; }
+  100% { transform: translateY(-100px) scale(1.5); opacity: 0; }
+}
+
+.bubble {
+  position: absolute;
+  bottom: 10px;
+  width: 8px;
+  height: 8px;
+  background: rgba(255, 255, 255, 0.4);
+  border-radius: 50%;
+  opacity: 0;
+}
+
+.bubble.b1 { left: 20%; animation: floatUp 2s infinite ease-in; }
+.bubble.b2 { left: 50%; animation: floatUp 1.5s infinite ease-in 0.5s; }
+.bubble.b3 { left: 80%; animation: floatUp 2.5s infinite ease-in 0.2s; }
+
+.liquid-flowing .liquid-surface {
+  animation: surfaceWave 1s infinite alternate ease-in-out;
+}
+
+@keyframes surfaceWave {
+  0% { transform: scaleY(1); }
+  100% { transform: scaleY(1.5); }
+}
+
+/* Outline / Valve */
+.tank-outlet {
+  position: absolute;
+  bottom: 20px;
+  right: -50px;
+  display: flex;
+  align-items: center;
+}
+
+.pipe {
+  width: 60px;
+  height: 20px;
+  background: #334155;
+  border-radius: 0 4px 4px 0;
+  position: relative;
+  overflow: hidden;
+  border: 2px solid #1e293b;
+  border-left: none;
+}
+
+.pipe-flow {
+  height: 100%;
+  width: 0%;
+  transition: width 0.3s;
+  position: relative;
+}
+
+.pipe-flow.flow-active {
+  width: 100%;
+}
+
+.flow-lines {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 200%;
+  height: 100%;
+  background: repeating-linear-gradient(
+    -45deg,
+    transparent,
+    transparent 5px,
+    rgba(255,255,255,0.2) 5px,
+    rgba(255,255,255,0.2) 10px
+  );
+  animation: flowMove 1s linear infinite;
+}
+
+@keyframes flowMove {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+.valve {
+  width: 10px;
+  height: 30px;
+  background: #475569;
+  border-radius: 4px;
+  position: absolute;
+  left: 30px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border: 2px solid #1e293b;
+}
+
+.valve-handle {
+  width: 20px;
+  height: 6px;
+  background: #ef4444; /* red handle */
+  border-radius: 4px;
+  transition: transform 0.3s;
+}
+
+.valve-handle.valve-open {
+  transform: rotate(90deg);
+}
+
+
+/* General Animations */
+@keyframes shake {
+  0%, 100% { transform: translate(0, 0) rotate(0deg) scale(1.1); }
+  25% { transform: translate(2px, 2px) rotate(-1deg) scale(1.1); }
+  50% { transform: translate(-2px, -2px) rotate(1deg) scale(1.1); }
+  75% { transform: translate(2px, -2px) rotate(0deg) scale(1.1); }
+}
+
+.anim-shake {
+  animation: shake 0.2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+.anim-pulse {
+  animation: pulse 1s infinite;
+}
+
+.fade-in {
+  animation: fadeIn 0.4s ease-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .simulation-container {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* --- VIBRATION ENHANCEMENTS --- */
+/* Shockwaves */
+.shockwaves {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 100%;
+  height: 100%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  z-index: -1;
+}
+
+.shockwave {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 250px;
+  height: 350px;
+  border-radius: 40px;
+  border: 4px solid rgba(239, 68, 68, 0.4);
+  transform: translate(-50%, -50%) scale(1);
+  opacity: 0;
+}
+
+.shockwave.sw-1 {
+  animation: shockwave-ripple 1s infinite linear;
+}
+
+.shockwave.sw-2 {
+  animation: shockwave-ripple 1s infinite linear 0.5s;
+}
+
+@keyframes shockwave-ripple {
+  0% { transform: translate(-50%, -50%) scale(1); opacity: 0.6; }
+  100% { transform: translate(-50%, -50%) scale(1.4); opacity: 0; }
+}
+
+/* Liquid Vibrating Waves */
+.liquid-vibrating .liquid-surface {
+  animation: surfaceWaveVibrate 0.15s infinite alternate ease-in-out !important;
+}
+
+@keyframes surfaceWaveVibrate {
+  0% { transform: scaleY(1) translateY(0) skewX(0); }
+  100% { transform: scaleY(1.3) translateY(3px) skewX(5deg); }
+}
