@@ -91,14 +91,14 @@ router.get('/', async (_req: Request, res: Response) => {
 // GET /api/reports/:id/download — download a report
 router.get('/:id/download', async (req: Request, res: Response) => {
   try {
-    const data = await getReportData(req.params.id);
+    const data = await getReportData(req.params.id as string);
     if (!data) {
       res.status(404).json({ error: 'Report not found' });
       return;
     }
 
     const reports = await getReportRecords();
-    const report = reports.find((r: any) => r.id === req.params.id);
+    const report = reports.find((r: any) => r.id === (req.params.id as string));
     const format = report?.format || 'json';
     const buffer = Buffer.from(data, 'base64');
 
@@ -129,7 +129,7 @@ router.get('/:id/download', async (req: Request, res: Response) => {
 // DELETE /api/reports/:id
 router.delete('/:id', async (req: Request, res: Response) => {
   try {
-    const ok = await deleteReport(req.params.id);
+    const ok = await deleteReport(req.params.id as string);
     res.json({ success: ok });
   } catch (err) {
     console.error('[Reports] Error deleting report:', err);

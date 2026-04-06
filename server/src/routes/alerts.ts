@@ -34,7 +34,7 @@ router.get('/stats', async (_req: Request, res: Response) => {
 // PUT /api/alerts/:id/acknowledge
 router.put('/:id/acknowledge', async (req: Request, res: Response) => {
   try {
-    const ok = await acknowledgeAlert(req.params.id);
+    const ok = await acknowledgeAlert(req.params.id as string);
     res.json({ success: ok });
   } catch (err) {
     console.error('[Alerts] Error acknowledging alert:', err);
