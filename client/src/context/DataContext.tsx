@@ -23,7 +23,8 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
     let reconnectTimer: number;
 
     const connect = () => {
-      ws = new WebSocket('ws://localhost:3001/ws');
+      const WS_URL = import.meta.env.VITE_WS_URL || 'ws://localhost:3001/ws';
+      ws = new WebSocket(WS_URL);
 
       ws.onopen = () => {
         setData((prev) => ({ ...prev, isConnected: true }));

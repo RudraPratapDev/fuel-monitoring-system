@@ -71,6 +71,4 @@ npm run dev
 Navigate to `http://localhost:5173` in your browser. 
 Once successfully connected, the system will begin fetching live sensor artifacts over the WebSocket proxy and actively surveying the data streams for system threats.
 
-## Version Control
 
-This repository is strictly configured to protect `.env` secrets. Make sure your local repository is tied properly before any continuous integration deployments are scheduled.
