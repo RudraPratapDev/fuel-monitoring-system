@@ -69,6 +69,14 @@ let pollTimer: ReturnType<typeof setInterval>;
 
 async function pollSensors(): Promise<void> {
   try {
+    // Check global settings before polling exactly to save Blynk API limits
+    const { Settings } = await import('./models/Settings');
+    const config = await Settings.findOne();
+    if (config && config.blynkPolling === false) {
+      // Skipping poll to save tokens
+      return;
+    }
+
     const sensorData = await fetchAllSensorData();
     const threat = assessThreat(sensorData);
 

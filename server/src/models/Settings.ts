@@ -6,6 +6,7 @@ export interface ISettings extends Document {
     warning: boolean;
     info: boolean;
   };
+  blynkPolling: boolean;
 }
 
 const SettingsSchema = new Schema<ISettings>(
@@ -15,6 +16,7 @@ const SettingsSchema = new Schema<ISettings>(
       warning: { type: Boolean, required: true, default: false },
       info: { type: Boolean, required: true, default: false },
     },
+    blynkPolling: { type: Boolean, required: true, default: true },
   },
   { timestamps: true }
 );

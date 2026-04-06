@@ -9,7 +9,8 @@ router.get('/', async (req, res) => {
     let settings = await Settings.findOne();
     if (!settings) {
       settings = await Settings.create({
-        telegramAlerts: { critical: true, warning: false, info: false }
+        telegramAlerts: { critical: true, warning: false, info: false },
+        blynkPolling: true
       });
     }
     res.json(settings);
@@ -22,13 +23,14 @@ router.get('/', async (req, res) => {
 // PUT /api/settings
 router.put('/', async (req, res) => {
   try {
-    const { telegramAlerts } = req.body;
+    const { telegramAlerts, blynkPolling } = req.body;
     let settings = await Settings.findOne();
     
     if (!settings) {
-      settings = new Settings({ telegramAlerts });
+      settings = new Settings({ telegramAlerts, blynkPolling: blynkPolling !== undefined ? blynkPolling : true });
     } else {
       if (telegramAlerts) settings.telegramAlerts = telegramAlerts;
+      if (blynkPolling !== undefined) settings.blynkPolling = blynkPolling;
     }
     
     await settings.save();

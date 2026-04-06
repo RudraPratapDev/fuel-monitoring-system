@@ -3,7 +3,7 @@ import { Activity, Droplet, ArrowRightLeft, ShieldCheck, ShieldAlert } from 'luc
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
 
 export default function Overview() {
-  const { sensor, threat } = useData();
+  const { sensor, threat, rollingHistory } = useData();
 
   // Safe fallback while loading
   if (!sensor) {
@@ -14,17 +14,6 @@ export default function Overview() {
   let statusColor = 'var(--status-success)';
   if (threat?.severity === 'warning') statusColor = 'var(--status-warning)';
   if (threat?.severity === 'critical') statusColor = 'var(--status-danger)';
-
-  // Static mock data for the 24h chart if API history is not immediately loaded
-  const chartData = [
-    { time: '00:00', value: 85 },
-    { time: '04:00', value: 83 },
-    { time: '08:00', value: 80 },
-    { time: '12:00', value: 78 },
-    { time: '16:00', value: 76 },
-    { time: '20:00', value: 74 },
-    { time: 'Now', value: sensor.fuelLevel },
-  ];
 
   return (
     <div className="dashboard-grid">
@@ -80,23 +69,23 @@ export default function Overview() {
 
       {/* ── ROW 2: Charts & Security ── */}
       <div className="card col-8">
-        <div className="card-title">Fuel Level Trend (Last 24h)</div>
+        <div className="card-title">Live Fuel Level Trend (Simulated)</div>
         <div style={{ height: '300px', width: '100%', marginTop: '20px' }}>
           <ResponsiveContainer width="100%" height="100%">
-            <AreaChart data={chartData} margin={{ top: 5, right: 0, left: -20, bottom: 0 }}>
+            <AreaChart data={rollingHistory || []} margin={{ top: 5, right: 0, left: -20, bottom: 0 }}>
               <defs>
                 <linearGradient id="colorValue" x1="0" y1="0" x2="0" y2="1">
                   <stop offset="5%" stopColor="var(--accent-primary)" stopOpacity={0.3}/>
                   <stop offset="95%" stopColor="var(--accent-primary)" stopOpacity={0}/>
                 </linearGradient>
               </defs>
-              <XAxis dataKey="time" axisLine={false} tickLine={false} tick={{ fill: 'var(--text-muted)', fontSize: 12 }} />
+              <XAxis dataKey="timeString" axisLine={false} tickLine={false} tick={{ fill: 'var(--text-muted)', fontSize: 12 }} />
               <YAxis axisLine={false} tickLine={false} tick={{ fill: 'var(--text-muted)', fontSize: 12 }} domain={[0, 100]} />
               <Tooltip 
-                contentStyle={{ backgroundColor: 'var(--bg-card)', border: '1px solid var(--border-subtle)', borderRadius: '8px' }}
+                contentStyle={{ backgroundColor: 'rgba(15, 23, 42, 0.85)', border: '1px solid var(--border-subtle)', borderRadius: '8px' }}
                 itemStyle={{ color: 'var(--text-primary)' }}
               />
-              <Area type="monotone" dataKey="value" stroke="var(--accent-primary)" strokeWidth={2} fillOpacity={1} fill="url(#colorValue)" />
+              <Area type="monotone" dataKey="mappedFuelLevel" name="Fuel Level (%)" stroke="var(--accent-primary)" strokeWidth={2} fillOpacity={1} fill="url(#colorValue)" />
             </AreaChart>
           </ResponsiveContainer>
         </div>
