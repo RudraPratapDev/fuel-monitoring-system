@@ -5,6 +5,7 @@ export type SystemStatus =
   | 'TANK_OPEN'
   | 'TAMPERING'
   | 'ACTIVE_BREACH'
+  | 'FORCED_EXTRACTION'
   | 'ADULTERATION'
   | 'CRITICAL';
 

@@ -10,6 +10,8 @@ const TURBIDITY_THRESHOLD = 70;
 const FUEL_DROP_THRESHOLD = 5;
 
 let previousFuelLevel: number | null = null;
+let recentVibrationTimestamp: number | null = null;
+const VIBRATION_MEMORY_MS = 120000; // Track vibrations for 2 minutes
 
 // In-memory cache of recent alerts for fast access
 let alertCache: Alert[] = [];
@@ -22,6 +24,11 @@ export function assessThreat(data: SensorData): ThreatAssessment {
   const tankOpen = data.reedSwitch === 1;
   const vibrationDetected = data.vibration === 1;
   const turbidityHigh = data.turbidity > TURBIDITY_THRESHOLD;
+
+  if (vibrationDetected) {
+    recentVibrationTimestamp = Date.now();
+  }
+  const recentVibration = recentVibrationTimestamp !== null && (Date.now() - recentVibrationTimestamp < VIBRATION_MEMORY_MS);
 
   // We only reset previousFuelLevel if it's not dropping, so slow leaks accumulate over polls
   // until they hit the threshold, UNLESS they increase (refueling).
@@ -53,6 +60,19 @@ export function assessThreat(data: SensorData): ThreatAssessment {
       status: 'ACTIVE_BREACH',
       label: 'Active Theft Breach',
       description: 'Tank lid is open and fuel level is actively dropping without flow authorization.',
+      severity: 'critical',
+      conditions,
+    };
+    persistAlert(assessment, data);
+    return assessment;
+  }
+
+  // ── FORCED EXTRACTION: Dropping fuel shortly after physical tampering ──
+  if (minorFuelDrop && !flowActive && recentVibration && !tankOpen) {
+    const assessment: ThreatAssessment = {
+      status: 'FORCED_EXTRACTION',
+      label: 'Forced Extraction Detected',
+      description: 'Physical tampering was detected recently and is now followed by unauthorized fuel loss (e.g., pipeline drilling).',
       severity: 'critical',
       conditions,
     };
