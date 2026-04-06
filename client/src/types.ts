@@ -4,6 +4,7 @@ export type SystemStatus =
   | 'SILENT_LEAK'
   | 'TANK_OPEN'
   | 'TAMPERING'
+  | 'ACTIVE_BREACH'
   | 'ADULTERATION'
   | 'CRITICAL';
 

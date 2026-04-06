@@ -15,7 +15,11 @@ export async function sendTelegramAlert(source: string, message: string, severit
     return;
   }
 
-  const timestamp = new Date().toLocaleString();
+  const timestamp = new Date().toLocaleString('en-IN', { 
+    timeZone: process.env.TIMEZONE || 'Asia/Kolkata',
+    dateStyle: 'medium',
+    timeStyle: 'medium'
+  });
   
   // Clean, professional formatting (no emojis)
   const severityTag = severity.toUpperCase();

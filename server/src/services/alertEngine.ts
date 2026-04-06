@@ -15,14 +15,21 @@ let previousFuelLevel: number | null = null;
 let alertCache: Alert[] = [];
 
 export function assessThreat(data: SensorData): ThreatAssessment {
-  const fuelDropping =
-    previousFuelLevel !== null && previousFuelLevel - data.fuelLevel >= FUEL_DROP_THRESHOLD;
+  const fuelDropAmount = previousFuelLevel !== null ? previousFuelLevel - data.fuelLevel : 0;
+  const fuelDropping = fuelDropAmount >= FUEL_DROP_THRESHOLD;
+  const minorFuelDrop = fuelDropAmount > 0;
   const flowActive = data.flowRate > 0;
   const tankOpen = data.reedSwitch === 1;
   const vibrationDetected = data.vibration === 1;
   const turbidityHigh = data.turbidity > TURBIDITY_THRESHOLD;
 
-  previousFuelLevel = data.fuelLevel;
+  // We only reset previousFuelLevel if it's not dropping, so slow leaks accumulate over polls
+  // until they hit the threshold, UNLESS they increase (refueling).
+  if (previousFuelLevel === null || fuelDropAmount < 0) {
+    previousFuelLevel = data.fuelLevel;
+  } else if (fuelDropping) {
+    previousFuelLevel = data.fuelLevel; // Reset after triggering a major drop event
+  }
 
   const conditions = { fuelDropping, flowActive, tankOpen, vibrationDetected, turbidityHigh };
 
@@ -32,7 +39,7 @@ export function assessThreat(data: SensorData): ThreatAssessment {
       status: 'CRITICAL',
       label: 'Critical Theft Event',
       description:
-        'Multiple high-risk indicators: rapid fuel drop with zero flow and physical access/tampering detected.',
+        'Multiple high-risk indicators: severe fuel drop with zero flow and physical access/tampering detected.',
       severity: 'critical',
       conditions,
     };
@@ -40,12 +47,25 @@ export function assessThreat(data: SensorData): ThreatAssessment {
     return assessment;
   }
 
-  // ── FUEL THEFT: Dropping + no flow + tank open ──
-  if (fuelDropping && !flowActive && tankOpen) {
+  // ── ACTIVE BREACH: Lid open while fuel changing (any amount) ──
+  if (tankOpen && minorFuelDrop && !flowActive) {
+    const assessment: ThreatAssessment = {
+      status: 'ACTIVE_BREACH',
+      label: 'Active Theft Breach',
+      description: 'Tank lid is open and fuel level is actively dropping without flow authorization.',
+      severity: 'critical',
+      conditions,
+    };
+    persistAlert(assessment, data);
+    return assessment;
+  }
+
+  // ── FUEL THEFT: Heavy Dropping + no flow ──
+  if (fuelDropping && !flowActive) {
     const assessment: ThreatAssessment = {
       status: 'FUEL_THEFT',
-      label: 'Fuel Theft Detected',
-      description: 'Fuel level dropping rapidly with zero flow and unauthorized tank access.',
+      label: 'Severe Siphoning Detected',
+      description: 'Fuel level dropping rapidly with zero authorized flow. Possible pipeline breach.',
       severity: 'critical',
       conditions,
     };
@@ -53,13 +73,13 @@ export function assessThreat(data: SensorData): ThreatAssessment {
     return assessment;
   }
 
-  // ── SILENT LEAK: Dropping + no flow + no physical access ──
-  if (fuelDropping && !flowActive && !tankOpen && !vibrationDetected) {
+  // ── SILENT LEAK: Minor dropping consistently over time + no flow ──
+  if (minorFuelDrop && fuelDropAmount >= 2 && !flowActive && !tankOpen && !vibrationDetected) {
     const assessment: ThreatAssessment = {
       status: 'SILENT_LEAK',
       label: 'Possible Silent Leak',
       description:
-        'Fuel level decreasing without flow or physical access — possible hidden siphoning or pipeline leak.',
+        'Fuel level decreasing slowly over time without flow or physical access — possible hidden leak.',
       severity: 'warning',
       conditions,
     };
