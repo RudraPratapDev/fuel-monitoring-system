@@ -1,0 +1,107 @@
+.location-page {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  height: 100%;
+}
+
+.location-header h2 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-bottom: 0.25rem;
+}
+
+.location-header p {
+  color: var(--text-muted);
+  font-size: 0.9rem;
+}
+
+.location-container {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  padding: 1.5rem;
+  gap: 1rem;
+}
+
+.map-toolbar {
+  display: flex;
+  justify-content: space-between;
+  background: var(--bg-color);
+  padding: 1rem 1.5rem;
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+}
+
+.toolbar-stat {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.stat-icon {
+  color: var(--text-muted);
+}
+
+.stat-label {
+  display: block;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  font-weight: 600;
+  margin-bottom: 0.25rem;
+}
+
+.stat-val {
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.stat-val.monospace {
+  font-family: monospace;
+}
+
+.status-badge {
+  padding: 0.2rem 0.6rem;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.status-badge.moving {
+  background: rgba(59, 130, 246, 0.15);
+  color: #3b82f6;
+}
+
+.status-badge.stopped {
+  background: rgba(239, 68, 68, 0.15);
+  color: #ef4444;
+}
+
+.status-badge.arrived {
+  background: rgba(34, 197, 94, 0.15);
+  color: #22c55e;
+}
+
+.map-wrapper {
+  flex: 1;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid var(--border-color);
+  min-height: 400px;
+  position: relative;
+  z-index: 1; /* Keep leaflet controls below custom dropdowns if any */
+}
+
+.leaflet-container-custom {
+  width: 100%;
+  height: 100%;
+}
+
+/* Fix generic leaflet filter in dark mode if needed */
+body.dark-mode .leaflet-layer,
+body.dark-mode .leaflet-control-zoom-in,
+body.dark-mode .leaflet-control-zoom-out,
+body.dark-mode .leaflet-control-attribution {
+  filter: invert(100%) hue-rotate(180deg) brightness(95%) contrast(90%);
+}

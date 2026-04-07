@@ -11,7 +11,8 @@ import {
   Sun, 
   Moon,
   ChevronRight,
-  MonitorPlay
+  MonitorPlay,
+  Map as MapIcon
 } from 'lucide-react';
 import './Layout.css';
 
@@ -26,6 +27,7 @@ export default function Layout() {
     { name: 'Security', path: '/security', icon: <ShieldAlert size={20} /> },
     { name: 'Reports', path: '/reports', icon: <FileText size={20} /> },
     { name: 'Simulator', path: '/simulator', icon: <MonitorPlay size={20} /> },
+    { name: 'Location', path: '/location', icon: <MapIcon size={20} /> },
   ];
 
   return (

@@ -1,6 +1,7 @@
 import { useData } from '../context/DataContext';
 import './LiveAnimation.css';
 import { Activity } from 'lucide-react';
+import { useState, useEffect, useRef } from 'react';
 
 export default function LiveAnimation() {
   const { sensor, isConnected } = useData();
@@ -17,6 +18,37 @@ export default function LiveAnimation() {
   const isLidOpen = reedSwitch === 1;
   const isVibrating = vibration > 0;
   const isFlowing = flowRate > 0;
+  
+  // Refueling & Anomaly simulation
+  const [isRefueling, setIsRefueling] = useState(false);
+  const [isSuspiciousFill, setIsSuspiciousFill] = useState(false);
+  const prevFuelRef = useRef(fuelLevel);
+  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    if (sensor) {
+       if (sensor.fuelLevel > prevFuelRef.current + 0.1) { // Buffer to ignore noise
+          if (sensor.flowRate > 0) {
+            // Fuel increasing while flowRate > 0 (vehicle is moving/engine on)
+            setIsSuspiciousFill(true);
+            setIsRefueling(false);
+          } else {
+            // Normal refueling while stopped
+            setIsRefueling(true);
+            setIsSuspiciousFill(false);
+          }
+          if (timeoutRef.current) clearTimeout(timeoutRef.current);
+          timeoutRef.current = setTimeout(() => {
+             setIsRefueling(false);
+             setIsSuspiciousFill(false);
+          }, 3000);
+       }
+       prevFuelRef.current = sensor.fuelLevel;
+    }
+    return () => {
+      if (timeoutRef.current) clearTimeout(timeoutRef.current);
+    };
+  }, [sensor]);
   
   // Smoothly transition fluid color based on turbidity (0 = Blue, 100 = Murky Brown)
   const getFluidColor = (t: number) => {
@@ -80,12 +112,20 @@ export default function LiveAnimation() {
 
             {/* System Status Indicators above tank */}
             <div className="tank-status-indicators">
+              {isSuspiciousFill && <span className="badge danger anim-pulse">UNAUTHORIZED FILL (MOVING)</span>}
+              {isRefueling && <span className="badge safe anim-pulse">ACTIVE REFUELING</span>}
               {isVibrating && <span className="badge danger anim-pulse"><Activity size={14}/> Vibration</span>}
               {!isConnected && <span className="badge warning anim-pulse">Disconnected</span>}
             </div>
 
             {/* The Tank */}
             <div className="tank">
+              
+              {/* Optional Refuel Hose that drops in */}
+              <div className={`refuel-hose ${isRefueling ? 'hose-active' : ''}`}>
+                 <div className="hose-nozzle"></div>
+                 {isRefueling && <div className="refuel-drops"></div>}
+              </div>
               
               {/* Lid */}
               <div className={`tank-lid ${isLidOpen ? 'lid-open' : ''}`}>
