@@ -7,11 +7,11 @@ import { sendTelegramAlert } from './telegram';
 import { v4Fallback } from '../utils';
 
 const TURBIDITY_THRESHOLD = 70;
-const FUEL_DROP_THRESHOLD = 5;
+const FUEL_DROP_THRESHOLD = 0.5;
 
 let previousFuelLevel: number | null = null;
 let recentVibrationTimestamp: number | null = null;
-const VIBRATION_MEMORY_MS = 120000; // Track vibrations for 2 minutes
+const VIBRATION_MEMORY_MS = 15000; // Track vibrations strictly for 15 seconds as requested
 
 // In-memory cache of recent alerts for fast access
 let alertCache: Alert[] = [];
@@ -40,13 +40,12 @@ export function assessThreat(data: SensorData): ThreatAssessment {
 
   const conditions = { fuelDropping, flowActive, tankOpen, vibrationDetected, turbidityHigh };
 
-  // ── CRITICAL: Multi-indicator theft event ──
-  if (fuelDropping && !flowActive && (tankOpen || vibrationDetected)) {
+  // ── CRITICAL: Lid open + rapid fuel drop ──
+  if (tankOpen && fuelDropping) { // Removed !flowActive requirement as open lid + drop is always critical
     const assessment: ThreatAssessment = {
       status: 'CRITICAL',
-      label: 'Critical Theft Event',
-      description:
-        'Multiple high-risk indicators: severe fuel drop with zero flow and physical access/tampering detected.',
+      label: 'Critical Tampering Detected',
+      description: 'Tank lid is open and fuel level is dropping rapidly (out of sync). Severe siphoning in progress!',
       severity: 'critical',
       conditions,
     };
@@ -54,7 +53,21 @@ export function assessThreat(data: SensorData): ThreatAssessment {
     return assessment;
   }
 
-  // ── ACTIVE BREACH: Lid open while fuel changing (any amount) ──
+  // ── CRITICAL: Vibration + Drop ──
+  if (fuelDropping && recentVibration) { // Removed !flowActive constraint
+    const assessment: ThreatAssessment = {
+      status: 'CRITICAL',
+      label: 'Critical Theft Event',
+      description:
+        'Physical access/tampering reported within the last 15 seconds combined with severe fuel drop.',
+      severity: 'critical',
+      conditions,
+    };
+    persistAlert(assessment, data);
+    return assessment;
+  }
+
+  // ── ACTIVE BREACH: Lid open while fuel changing slowly (any amount) ──
   if (tankOpen && minorFuelDrop && !flowActive) {
     const assessment: ThreatAssessment = {
       status: 'ACTIVE_BREACH',

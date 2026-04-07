@@ -37,16 +37,30 @@ export default function LiveAnimation() {
             setIsRefueling(true);
             setIsSuspiciousFill(false);
           }
-          if (timeoutRef.current) clearTimeout(timeoutRef.current);
-          timeoutRef.current = setTimeout(() => {
-             setIsRefueling(false);
-             setIsSuspiciousFill(false);
-          }, 3000);
+          
+          // Only start the timeout once, so it strictly hides after a few seconds
+          // even if the fuel level keeps increasing.
+          if (!timeoutRef.current) {
+            timeoutRef.current = setTimeout(() => {
+               setIsRefueling(false);
+               setIsSuspiciousFill(false);
+               timeoutRef.current = null;
+            }, 4000); // exactly 4 seconds
+          }
+       } else if (sensor.fuelLevel < prevFuelRef.current - 0.1) {
+          // If fuel actively dropping, instantly hide the pipe
+          setIsRefueling(false);
+          setIsSuspiciousFill(false);
+          if (timeoutRef.current) {
+            clearTimeout(timeoutRef.current);
+            timeoutRef.current = null;
+          }
        }
        prevFuelRef.current = sensor.fuelLevel;
     }
     return () => {
-      if (timeoutRef.current) clearTimeout(timeoutRef.current);
+      // Cleanup happens on unmount, but keep ref intact during continuous renders
+      if (timeoutRef.current === undefined) {} 
     };
   }, [sensor]);
   
@@ -120,12 +134,6 @@ export default function LiveAnimation() {
 
             {/* The Tank */}
             <div className="tank">
-              
-              {/* Optional Refuel Hose that drops in */}
-              <div className={`refuel-hose ${isRefueling ? 'hose-active' : ''}`}>
-                 <div className="hose-nozzle"></div>
-                 {isRefueling && <div className="refuel-drops"></div>}
-              </div>
               
               {/* Lid */}
               <div className={`tank-lid ${isLidOpen ? 'lid-open' : ''}`}>
