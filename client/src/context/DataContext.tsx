@@ -125,7 +125,8 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
   // Interval for capturing rolling history every 2 seconds
   useEffect(() => {
     const historyInterval = setInterval(() => {
-      if (currentFuelLevelRef.current !== null) {
+      // Do not push artificial zero points before the first connection payload
+      if (lastApiFuelLevelRef.current !== null) {
         const now = new Date();
         const stat = currentStatusRef.current;
         const isTheft = stat === 'FUEL_THEFT' || stat === 'ACTIVE_BREACH' || stat === 'FORCED_EXTRACTION';
